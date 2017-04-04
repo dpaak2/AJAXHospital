@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hospital.web.mapper.Mapper">
+	<resultMap id="Patient" type="com.hospital.web.domain.Patient">
+		<id property="id" column="pat_id" />
+		<result property="nurID" column="nur_id" />
+		<result property="docID" column="doc_id" />
+		<result property="pass" column="pat_pass" />
+		<result property="name" column="pat_name" />
+		<result property="gen" column="pat_gen" />
+		<result property="jumin" column="pat_jumin" />
+		<result property="addr" column="pat_addr" />
+		<result property="phone" column="pat_phone" />
+		<result property="email" column="pat_email" />
+		<result property="job" column="pat_job" />
+
+	</resultMap>
+	<resultMap id="Doctor" type="com.hospital.web.domain.Doctor">
+		<id property="id" column="doc_id" />
+		<result property="pass" column="doc_pass" />
+		<result property="majorTreat" column="pat_job" />
+		<result property="name" column="doc_name" />
+		<result property="gen" column="doc_gen" />
+		<result property="position" column="doc_position" />
+		<result property="phone" column="doc_phone" />
+		<result property="email" column="doc_email" />
+	</resultMap>
+	<resultMap id="Nurse" type="com.hospital.web.domain.Nurse">
+		<id property="id" column="nur_id" />
+		<result property="pass" column="nur_pass" />
+		<result property="major" column="major_job" />
+		<result property="name" column="nur_name" />
+		<result property="gen" column="nur_gen" />
+		<result property="position" column="nur_position" />
+		<result property="phone" column="nur_phone" />
+		<result property="email" column="nur_email" />
+	</resultMap>
+	<insert id="registPatient">
+		INSERT INTO ${group}(pat_id, nur_id, doc_id,
+		pat_pass, pat_name, pat_gen, pat_jumin, pat_addr, pat_phone,
+		pat_email, pat_job) VALUES
+		(#{id},#{nurID},#{docID},#{pass},#{name},#{gen},#{jumin},#{addr},#{phone},#{email},#{job})
+	</insert>
+	<insert id="insertDoctor">
+		INSERT INTO ${group}(doc_id, doc_pass, major_treat,
+		doc_name, doc_gen, doc_phone, doc_email, doc_position) VALUES
+		(#{id},#{pass},#{majorTreat},#{name},#{gen},#{phone},#{email},#{position})
+	</insert>
+	<insert id="registNurse">
+		INSERT INTO ${group}(nur_id, nur_pass, major_job,
+		nur_name, nur_gen, nur_phone, nur_email, nur_position) VALUES
+		(#{id},#{pass},#{majorJob},#{name},#{gen},#{phone},#{email},#{position})
+	</insert>
+	<select id="findPatient" resultMap="Patient" parameterType="hashMap">
+		SELECT * FROM ${group} WHERE ${key}=#{value}
+	</select>
+	<select id="findDoctor" resultMap="Doctor" parameterType="hashMap">
+		SELECT
+		* FROM ${group} WHERE ${key}=#{value}
+	</select>
+	<select id="findNurse" resultMap="Nurse" parameterType="hashMap">
+		SELECT *
+		FROM ${group} WHERE ${key}=#{value}
+	</select>
+
+	<select id="findPatients" resultMap="Patient" parameterType="hashMap">
+		SELECT * FROM ${group} WHERE
+		<if test="name != null"> AND name like #{name}	</if>
+		<if test="title != null">
+			AND title like #{title}
+		</if>
+		<if test="author != null and author.name != null">
+			AND author_name like #{author.name}
+		</if>
+	</select>
+	<select id="findDoctors" resultMap="Doctor" parameterType="hashMap">
+		SELECT * FROM ${group} WHERE
+		<if test="state != null">
+			AND state like #{state}
+		</if>
+		<if test="title != null">
+			AND title like #{title}
+		</if>
+		<if test="author != null and author.name != null">
+			AND author_name like #{author.name}
+		</if>
+	</select>
+	<select id="findNurses" resultMap="Nurse" parameterType="hashMap">
+		SELECT * FROM ${group} WHERE
+		<if test="name != null">
+			AND state like #{state}
+		</if>
+		<if test="gen != null">
+			AND title like #{title}
+		</if>
+		<if test="addr != null and author.name != null">
+			AND author_name like #{author.name}
+		</if>
+		<if test=" != null and author.name != null">
+			AND author_name like #{author.name}
+		</if>
+	</select>
+
+	<update id="updatePatient">
+		UPDATE ${group}
+		<set>
+			<if test="username != null">username=#{username},</if>
+			<if test="password != null">password=#{password},</if>
+			<if test="email != null">email=#{email},</if>
+			<if test="bio != null">bio=#{bio}</if>
+		</set>
+		WHERE ${key}=#{value}
+	</update>
+	<update id="updateDoctor">
+		update ${group}
+		<set>
+			<if test="username != null">username=#{username},</if>
+			<if test="password != null">password=#{password},</if>
+			<if test="email != null">email=#{email},</if>
+			<if test="bio != null">bio=#{bio}</if>
+		</set>
+		WHERE ${key}=#{value}
+	</update>
+	<update id="updateNurse">
+		UPDATE ${group}
+		<set>
+			<if test="username != null">username=#{username},</if>
+			<if test="password != null">password=#{password},</if>
+			<if test="email != null">email=#{email},</if>
+			<if test="bio != null">bio=#{bio}</if>
+		</set>
+		WHERE ${key}=#{value}
+	</update>
+
+
+	<select id="count" resultType="int">
+		SELECT COUNT(*) FROM ${group}
+	</select>
+	<select id="exist" resultType="int" parameterType="hashMap">
+		SELECT
+		COUNT(*) FROM ${group} WHERE ${key}=#{value}
+	</select>
+
+
+
+
+	<select id="find" resultType="com.hospital.web.domain.Patient">
+		SELECT * FROM Patient WHERE = ‘ACTIVE’
+		<if test="title != null">
+			AND title like #{title}
+		</if>
+	</select>
+	<select id="find2" resultType="com.hospital.web.domain.Patient">
+		SELECT * FROM
+		Patient WHERE state = ‘ACTIVE’
+		<if test="title != null">
+			AND title like #{title}
+		</if>
+		<if test="author != null and author.name != null">
+			AND author_name like #{author.name}
+		</if>
+	</select>
+	<select id="find3" resultType="com.hospital.web.domain.Patient">
+		SELECT * FROM
+		Patient WHERE
+		state = ‘ACTIVE’
+
+		<choose>
+			<when test="title != null">
+				AND title like #{title}
+			</when>
+			<when test="author != null and author.name != null">
+				AND author_name like #{author.name}
+			</when>
+			<otherwise>
+				AND featured = 1
+			</otherwise>
+		</choose>
+	</select>
+	<select id="find4" resultType="com.hospital.web.domain.Patient">
+		SELECT *
+		FROM
+		Patient
+		WHERE
+		<if test="state != null">
+			state = #{state}
+		</if>
+		<if test="title != null">
+			AND title like #{title}
+		</if>
+		<if test="author != null and author.name != null">
+			AND author_name like #{author.name}
+		</if>
+	</select>
+	<select id="find5" resultType="com.hospital.web.domain.Patient">
+		SELECT * FROM
+		Patient
+		<where>
+			<if test="state != null">
+				state = #{state}
+			</if>
+			<if test="title != null">
+				AND title like #{title}
+			</if>
+			<if test="author != null and author.name != null">
+				AND author_name like #{author.name}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectPostIn" resultType="com.hospital.web.domain.Patient">
+		SELECT * FROM
+		Patient POST P
+		WHERE ID in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<select id="selectBlogsLike" resultType="com.hospital.web.domain.Patient">
+		<bind name="pattern" value="'%' + _parameter.getTitle() + '%'" />
+		SELECT * FROM
+		Patient
+		WHERE
+		title LIKE #{pattern}
+	</select>
+	<delete id="delete" parameterType="hashMap">
+		DELETE FROM ${group} WHERE ${key}= #{value}
+	</delete>
+
+</mapper>
