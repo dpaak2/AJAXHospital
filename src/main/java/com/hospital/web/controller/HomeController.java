@@ -16,22 +16,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.hospital.web.composite.Complex;
-import com.hospital.web.domain.Context;
+
 
 /**
  * Handles requests for the application home page.
  */
 @Controller
-@SessionAttributes("context")
 public class HomeController {
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 //	@Autowired ContextDTO context;
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String index(HttpSession session) {
-		
+	public String index(Model model) {
 		logger.info("Welcome{}!!","home"); /*method�� �ش�? */
-
- 		session.setAttribute("context",Complex.ContextFactory.cerate());
+ 		model.addAttribute("context",Complex.ContextFactory.cerate());
 		return "index";
 	}
 	
