@@ -9,5 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminController {
 	private static final Logger logger = LoggerFactory.getLogger(PatientController.class);
+	@RequestMapping (value="/login")
+	public String goLogin(){
+		logger.info("AdminContoroller- goLogin(){}!!","home");
+		return "public:common/loginForm";
+	}
 
 }

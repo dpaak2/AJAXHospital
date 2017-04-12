@@ -1,5 +1,6 @@
 package com.hospital.web.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -28,9 +29,9 @@ public class PersonController {
 	private static final Logger logger = LoggerFactory.getLogger(PatientController.class);
 	@Autowired	Mapper mapper; /*이 안에 있는 지역변수에 공급해주라는 뜻 */
 
-	@RequestMapping(value = "/register/{type}", method = RequestMethod.POST) 
+	@RequestMapping(value = "/post/{group}", method = RequestMethod.POST) 
 	/*등록하러 왔다 등록하는 사람은 $ type} 전부 경로로 제어 한다. ,get방식과 Post방식도  쓸수  있게  됨 */
-	public String register(@PathVariable String type,
+	public String regist(@PathVariable String type,
 			@RequestBody Map<String, Object> map, /* JSON을 map으로 바꿔주는것 ,
 													 * map을 사용하면 화면에서 어떤 빈을 썼는지
 													 * 생각할 필요가 없다.
@@ -40,9 +41,12 @@ public class PersonController {
 																	 * patient
 																	 */
 			/*컨맨드 객체를 파라미터로 넘긴다*/
+			@PathVariable String group,
+			@SuppressWarnings("rawtypes") 
+			@RequestBody Person target,
 			Command command) throws Exception {
 		String movePosition = "";
-		logger.info("PersonController -register() {}", "ENTER");
+		logger.info("PersonController -regist() {}", "ENTER");
 		logger.info("PersonController -param value check () {}", "ENTER");
 		command.process(map);
 
@@ -86,6 +90,33 @@ public class PersonController {
 			return "redirect:/{" + type + "}/registForm";
 		}
 	}
+	
+	private Map<?,?> postPatient(Object o){
+		Map<?,?>map= new HashMap<>();
+		Person<?> person=new Person<Info>(new Patient());
+		Patient patient = (Patient) person.getInfo();
+		patient.getId();
+		patient.getGen();
+		patient.setJob("환자");
+		patient.getJumin();
+		patient.getName();
+		logger.info("PersonController","enter");
+		return map;
+		
+	}
+	private Map<?,?> postDoctor(Object o){
+		Map<?,?>map= new HashMap<>();
+		Person<?> person=new Person<Info>(new Patient());
+		Doctor doctor = (Doctor) person.getInfo();
+		doctor.getId();
+		doctor.getGen();
+		doctor.setJob("의사");
+		
+		doctor.getName();
+		logger.info("PersonController","enter");
+		return map;
+	}
+	
 
 	@RequestMapping("/detail/{docID}") /* docID-id 가 된다 */
 	public String detail(@PathVariable String docID) { /* 표시는해줘야 한다 */

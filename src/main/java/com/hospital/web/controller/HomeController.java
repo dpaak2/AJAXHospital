@@ -34,6 +34,7 @@ public class HomeController {
 	
 	@RequestMapping()
 	public String home(){
+		logger.info("진입: ","success");
 		return "public:common/container";
 	}
 }

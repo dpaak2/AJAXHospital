@@ -26,7 +26,7 @@ public interface Mapper { /*mapper는 람다로 바꿀수 없다 myBatis와 일�
 	public int updatePatient(Patient member) throws Exception;
 	public int updateDoctor(Doctor member) throws Exception;
 	public int updateNurse(Nurse member) throws Exception;
-	public int delete(Patient member) throws Exception;
+	public int delete(Map<?, ?> member) throws Exception;
 	public int count()throws Exception;
 	public int exist(Map<?,?>map)throws Exception;
 }
