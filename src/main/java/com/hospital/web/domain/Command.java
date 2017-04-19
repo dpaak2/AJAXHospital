@@ -2,11 +2,10 @@ package com.hospital.web.domain;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-@Component
+
+@Component @Lazy
 interface Orderable {
 	public Command process(Map<?, ?> map);
 }

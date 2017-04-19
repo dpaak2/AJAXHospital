@@ -1,18 +1,21 @@
 package com.hospital.web.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.hospital.web.domain.Admin;
 import com.hospital.web.domain.Command;
@@ -22,109 +25,295 @@ import com.hospital.web.domain.Nurse;
 import com.hospital.web.domain.Patient;
 import com.hospital.web.domain.Person;
 import com.hospital.web.mapper.Mapper;
+import com.hospital.web.service.PersonService;
 
-@Controller
+import jdk.nashorn.internal.scripts.JO;
 
+@RestController
 public class PersonController {
-	private static final Logger logger = LoggerFactory.getLogger(PatientController.class);
-	@Autowired	Mapper mapper; /*이 안에 있는 지역변수에 공급해주라는 뜻 */
+	private static final Logger logger = LoggerFactory.getLogger(PersonController.class);
+	@Autowired
+	Mapper mapper;
+	@Autowired
+	Doctor doctor;
+	@Autowired
+	Patient patient;
+	@Autowired
+	Nurse nurse;
+	@Autowired
+	PersonService personService;
 
-	@RequestMapping(value = "/post/{group}", method = RequestMethod.POST) 
-	/*등록하러 왔다 등록하는 사람은 $ type} 전부 경로로 제어 한다. ,get방식과 Post방식도  쓸수  있게  됨 */
-	public String regist(@PathVariable String type,
-			@RequestBody Map<String, Object> map, /* JSON을 map으로 바꿔주는것 ,
-													 * map을 사용하면 화면에서 어떤 빈을 썼는지
-													 * 생각할 필요가 없다.
-													 *//* 범용적으로 쓰는 패턴 *//*
-																	 * @ModelAttribute
-																	 * Patient
-																	 * patient
-																	 */
-			/*컨맨드 객체를 파라미터로 넘긴다*/
-			@PathVariable String group,
-			@SuppressWarnings("rawtypes") 
-			@RequestBody Person target,
-			Command command) throws Exception {
-		String movePosition = "";
-		logger.info("PersonController -regist() {}", "ENTER");
-		logger.info("PersonController -param value check () {}", "ENTER");
-		command.process(map);
+	@RequestMapping(value = "/post/patient", method = RequestMethod.POST, consumes = "application/json")
+	public @ResponseBody Map<?, ?> register(@RequestBody Patient patient) throws Exception {
+		logger.info("PersonController() {}", "==personController-register진입");
+		Map<String, String> map = new HashMap<>();
 
-		if (type.equals("")) {
-			type = "patient";
-		}
-		map.put("type", type); /* why? */
-		Person<?> person = command.process(map).getPersonInfo();/*이안에는 온갖 모든것이 다 저장된다 , */
 		/*
-		 * command가 진행을 해서 person 타입의 person으로 받을수 있다 , 내부적으로 알아서 command에 의해서
-		 * 결정되고 mybatis로
+		 * switch (group) { case "patient": map = postPatient(patient);
+		 * logger.info("PersonController() {}", patient + "register진입"); break;
+		 * case "doctor": map = postDoctor(patient);
+		 * logger.info("PersonController() {}", doctor + "register진입"); break;
+		 * case "nurse": map = postNurse(patient);
+		 * logger.info("PersonController() {}", nurse + "register진입"); break;
+		 * case "admin": map = postAdmin(patient);
+		 * logger.info("PersonController() {}", "register진입"); break; default:
+		 * break;
 		 */
-		int result = 0;
-		switch (map.get("type").toString()) {
+		/* } */
+		map.put("name", patient.getName());
+		return map;
+	}
+
+	@RequestMapping("/get/{group}/{target}")
+	public @ResponseBody Object get(@PathVariable String group, @PathVariable String target) {
+		Object o = null;
+		switch (group) {
 		case "patient":
-			result = mapper.registerPatient(person);
+			logger.info("group.equals({})", group);
+			o = getPatient();
+			patient.setId("hong");
+			patient.setName("홍길동");
+			patient.setPass("1234");
+			o = patient;
 			break;
 		case "doctor":
-			person = new Person<Info>(new Doctor());
-			Doctor doctor = (Doctor) person.getInfo();
-			result = mapper.registerPatient(person);
+			logger.info("group.equals({})", group);
+			o = getDoctor();
 			break;
-		case "Nurse":
-			person = new Person<Info>(new Nurse());
-			Nurse nurse = (Nurse) person.getInfo();
-			result = mapper.registerPatient(person);
+		case "nurse":
+			logger.info("group.equals({})", group);
+			o = getNurse();
 			break;
 		case "admin":
-			person = new Person<Info>(new Admin());
-			Admin admin = (Admin) person.getInfo();
-			result = mapper.registerPatient(person);
-			break;
-
-		default:
+			logger.info("group.equals({})", group);
+			o = getAdmin();
 			break;
 		}
-
-		if (result == 1) {
-			return "public:common/loginForm";
-		} else {
-			return "redirect:/{" + type + "}/registForm";
-		}
+		return o;
 	}
+
+	@RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
+	public @ResponseBody Map<?, ?> login(@RequestBody Map<String, String> paramMap) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		logger.info("PersonController(){} login", "enter");
+		String id = paramMap.get("id");
+		String pass = paramMap.get("pass");
+		String name = paramMap.get("name");
+		System.out.println("넘어온 아이디: " + id);
+		System.out.println("넘어온 password:" + pass);
+		String[] gArr = { "Patient/pat_id/" + id, "Doctor/doc_id/" + id, "Nurse/nur_id/" + id, "Admin/admin_id/" + id };
+		int rs = 0;
+		String target = "";
+		for (int i = 0; i < gArr.length; i++) {
+			String[] strArr = gArr[i].split("/");
+			paramMap.put("group", strArr[0]);
+			paramMap.put("idType", strArr[1]);
+			paramMap.put("id", strArr[2]);
+			rs = personService.exist(paramMap);
+			if (rs != 0) {
+				target = gArr[i];
+				break;
+			}
+		}
+
+		if (target.equals("")) {
+			map.put("result", "fail");
+		} else {
+			map.put("result", "success");
+			String[] arr = target.split("/");
+			switch (arr[0]) {
+			case "Patient":
+				paramMap.put("group", arr[0]);
+				paramMap.put("key", arr[1]);
+				paramMap.put("value", arr[2]);
+				Patient patient = personService.getPatient(paramMap);
+				map.put("name", patient.getName());
+				map.put("group", "고객");
+				map.put("patient", personService.getPatient(paramMap));
+				break;
+		
+			}
+
+		}
+		return map;
+	}
+
 	
-	private Map<?,?> postPatient(Object o){
-		Map<?,?>map= new HashMap<>();
-		Person<?> person=new Person<Info>(new Patient());
+	@RequestMapping(value = "/list/{group}", method = RequestMethod.POST, consumes = "application/json")
+	public @ResponseBody List<?> list(@PathVariable String group, @RequestBody Command command) {
+		List<?> list = new ArrayList<>();
+		switch (group) {
+		case "patient":
+			logger.info("group.equals({})", group);
+			list = getPatients();
+			break;
+		case "doctor":
+			logger.info("group.equals({})", group);
+			list = getDoctors();
+			break;
+		case "nurse":
+			logger.info("group.equals({})", group);
+			list = getNurses();
+			break;
+		case "admin":
+			logger.info("group.equals({})", group);
+			list = getAdmins();
+			break;
+		}
+		return list;
+	}
+
+	@RequestMapping(value = "/put/{group}/", method = RequestMethod.POST, consumes = "application/json")
+	public @ResponseBody Map<?, ?> put(@PathVariable String group,
+			@SuppressWarnings("rawtypes") @RequestBody Person target) throws Exception {
+		Map<?, ?> map = new HashMap<>();
+		switch (group) {
+		case "patinet":
+			map = putPatient(target);
+			break;
+		case "doctor":
+			map = putDoctor(target);
+			break;
+		case "nurse":
+			map = putNurse(target);
+			break;
+		case "admin":
+			map = putAdmin(target);
+			break;
+		}
+		return map;
+	}
+
+	@RequestMapping(value = "/put/{group}/{target}", method = RequestMethod.POST, consumes = "application/json")
+	public @ResponseBody Map<?, ?> delete(@PathVariable String group, @PathVariable String target,
+			@RequestBody Map<?, ?> param) throws Exception {
+		Map<?, ?> map = new HashMap<>();
+		switch (group) {
+		case "patinet":
+			map = deletePatient(target);
+			break;
+		case "doctor":
+			map = deleteDoctor(target);
+			break;
+		case "nurse":
+			map = deleteNurse(target);
+			break;
+		case "admin":
+			map = deleteAdmin(target);
+			break;
+		}
+		return map;
+	}
+
+	private Map<?, ?> postPatient(Object o) {
+		Map<?, ?> map = new HashMap<>();
+		Person<?> person = new Person<Info>(new Patient());
 		Patient patient = (Patient) person.getInfo();
 		patient.getId();
-		patient.getGen();
 		patient.setJob("환자");
+		patient.getGen();
 		patient.getJumin();
 		patient.getName();
-		logger.info("PersonController","enter");
-		return map;
-		
-	}
-	private Map<?,?> postDoctor(Object o){
-		Map<?,?>map= new HashMap<>();
-		Person<?> person=new Person<Info>(new Patient());
-		Doctor doctor = (Doctor) person.getInfo();
-		doctor.getId();
-		doctor.getGen();
-		doctor.setJob("의사");
-		
-		doctor.getName();
-		logger.info("PersonController","enter");
 		return map;
 	}
-	
 
-	@RequestMapping("/detail/{docID}") /* docID-id 가 된다 */
-	public String detail(@PathVariable String docID) { /* 표시는해줘야 한다 */
-		logger.info("PersonController-detail() {}", "ENTER");
-		// docID=request.getParameter("id"); - 내가 가지고 오는것은
-		if (docID.equals("")) {
-			return "redirect:/{permission}/login";
-		} /* session에 값이 있는지 체크해야 한다. */
-		return "doctor:doctor/containerDetail";
+	private Map<?, ?> postDoctor(Object o) {
+		Map<?, ?> map = new HashMap<>();
+		Person<?> person = new Person<Info>(new Doctor());
+		Doctor doctor = (Doctor) person.getInfo();
+		return map;
 	}
+
+	private Map<?, ?> postNurse(Object o) {
+		Map<?, ?> map = new HashMap<>();
+		Person<?> person = new Person<Info>(new Nurse());
+		Nurse nurse = (Nurse) person.getInfo();
+		return map;
+	}
+
+	private Map<?, ?> postAdmin(Object o) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Doctor getDoctor() {
+		Doctor doctor = new Doctor();
+		return doctor;
+	}
+
+	private Patient getPatient() {
+		Patient patient = new Patient();
+		return patient;
+	}
+
+	private Nurse getNurse() {
+		Nurse nurse = new Nurse();
+		return nurse;
+	}
+
+	private Admin getAdmin() {
+		Admin admin = new Admin();
+		return admin;
+	}
+
+	private List<Doctor> getDoctors() {
+		List<Doctor> list = new ArrayList<>();
+		return list;
+	}
+
+	private List<Patient> getPatients() {
+		List<Patient> list = new ArrayList<>();
+		return list;
+	}
+
+	private List<Nurse> getNurses() {
+		List<Nurse> list = new ArrayList<>();
+		return list;
+	}
+
+	private List<Admin> getAdmins() {
+		List<Admin> list = new ArrayList<>();
+		return list;
+	}
+
+	private Map<?, ?> putDoctor(Object target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Map<?, ?> putPatient(Object target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Map<?, ?> putNurse(Object target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Map<?, ?> putAdmin(Object target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Map<?, ?> deleteDoctor(String target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Map<?, ?> deletePatient(String target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Map<?, ?> deleteNurse(String target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
+	private Map<?, ?> deleteAdmin(String target) {
+		Map<?, ?> map = new HashMap<>();
+		return map;
+	}
+
 }

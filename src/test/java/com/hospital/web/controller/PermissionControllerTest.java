@@ -20,6 +20,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.hospital.web.domain.Enums;
 import com.hospital.web.domain.Patient;
@@ -27,6 +28,8 @@ import com.hospital.web.mapper.Mapper;
 @RunWith(MockitoJUnitRunner.class)
 @ContextConfiguration(locations="classpath:META-INF/application-context.xml")
 @WebAppConfiguration
+
+
 public class PermissionControllerTest {
 	@InjectMocks private PermissionController controller;
 	@Autowired WebAppConfiguration wac;

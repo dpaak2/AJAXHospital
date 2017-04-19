@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.hospital.web.domain.Doctor;
@@ -24,16 +25,17 @@ import com.hospital.web.domain.Patient;
 import com.hospital.web.domain.Person;
 import com.hospital.web.domain.Enums;
 import com.hospital.web.mapper.Mapper;
-import com.hospital.web.service.DeleteService;
-import com.hospital.web.service.ReadService;
+import com.hospital.web.service.IDeleteService;
+import com.hospital.web.service.IGetService;
 
-@Controller
+
+@RestController
 @SessionAttributes("permission")
 public class PermissionController {
 	private static final Logger logger = LoggerFactory.getLogger(PermissionController.class);
 	@Autowired	Mapper mapper;
 
-	@RequestMapping("/login")
+	@RequestMapping("/test/login")
 	public String login() {
 		logger.info("Permission -login() {}",
 				"ENTER"); /* goLogin이라는 method안으로 진입하였다 */
@@ -69,7 +71,7 @@ public class PermissionController {
 			 * return mapper.exist(map); } };
 			 */
 
-			ReadService exist = (amap) -> mapper.exist(amap); /* 정의만 된것 */
+			IGetService exist = (amap) -> mapper.exist(amap); /* 정의만 된것 */
 
 			Integer count = (Integer) exist.execute(map);/* mapper에 있는 exit를 실행된다 */
 
@@ -87,7 +89,7 @@ public class PermissionController {
 				 * @Override public Object execute(Object o) throws Exception {
 				 * return mapper.findPatient(map); } };
 				 */
-				ReadService findPatient = (Map<?, ?> paramMap) -> mapper
+				IGetService findPatient = (Map<?, ?> paramMap) -> mapper
 						.findPatient(map); /* 리턴은 무조건 하는거다 */
 				logger.info("DB RESULT: {}", "success");
 				patient = (Patient) findPatient.execute(map);
@@ -119,7 +121,7 @@ public class PermissionController {
 			 * @Override public Object execute(Map<?, ?> map) throws Exception {
 			 * return mapper.exist(docMap); } };
 			 */
-			ReadService exitDoctor = (o) -> mapper.exist(o);
+			IGetService exitDoctor = (o) -> mapper.exist(o);
 			count = mapper.exist(map);
 			
 			/* Integer docCount = (Integer) docEx.execute(id); */
@@ -128,7 +130,7 @@ public class PermissionController {
 				logger.info("DB RESULT : {}", "ID not exist");
 				movePostion = "public:common/loginForm";
 			} else {
-				ReadService findDoctor = (doctMap) -> mapper.findDoctor(doctMap);
+				IGetService findDoctor = (doctMap) -> mapper.findDoctor(doctMap);
 				doctor = (Doctor) findDoctor.execute(map);
 				if (doctor.getPass().equals(password)) {
 					logger.info("DB RESULT : {}", "success");
@@ -150,7 +152,7 @@ public class PermissionController {
 			nurMap.put("group", nurse.getGroup());
 			nurMap.put("key", Enums.NURSE.val());
 			nurMap.put("value", id);
-			ReadService exsit = (nmap) -> mapper.exist(nmap);
+			IGetService exsit = (nmap) -> mapper.exist(nmap);
 			Integer nurCount = (Integer) mapper.exist(nurMap);
 			logger.info("ID exist? : {}", nurCount);
 
@@ -158,7 +160,7 @@ public class PermissionController {
 				logger.info("DB RESULT : {}", "ID not exist");
 				movePostion = "public:common/loginForm";
 			} else {
-				ReadService findNurse = (nurseMap) -> mapper.findDoctor(nurseMap);
+				IGetService findNurse = (nurseMap) -> mapper.findDoctor(nurseMap);
 				nurse = (Nurse) findNurse.execute(nurMap);
 				if (nurse.getPass().equals(password)) {
 					logger.info("DB RESULT : {}", "success");
@@ -248,7 +250,7 @@ public class PermissionController {
 		map.put("group", patient.getGroup());
 		map.put("key", Enums.PATIENT.val());
 		map.put("value", id);
-		DeleteService deletePatient=(patMap)->mapper.delete(patMap);
+		IDeleteService deletePatient=(patMap)->mapper.delete(patMap);
 		int result=deletePatient.execute(map);
 		if(result==0){
 			goDeletePage= "patient:patient/deleteForm";

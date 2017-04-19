@@ -11,5 +11,7 @@ import lombok.Setter;
 public class Chart {
 	@Getter
 	@Setter
-	private String charID, treatID, docId, patID, nurID, chartContent;
+	private String chartId, patientId, nurseId, doctorId, pass,name,gen, jumin,
+				addr,phone,email,job,treatmentId,chartContents,doctorMajor,doctorName,doctorPosition,nurseName
+				,nurPosition,treatContents,treatDate;
 }

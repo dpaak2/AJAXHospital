@@ -31,10 +31,13 @@ public class HomeController {
  		model.addAttribute("context",Complex.ContextFactory.cerate());
 		return "index";
 	}
-	
-	@RequestMapping()
+	@RequestMapping(value="/home")
 	public String home(){
 		logger.info("진입: ","success");
 		return "public:common/container";
+	}
+	@RequestMapping(value="/permission/form")   /*notiles 쓰는곳*/
+	public String login(){
+		return "common/permission.jsp";
 	}
 }

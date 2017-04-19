@@ -1,3 +1,45 @@
+/*
+========= app-meta ==========
+app-algorithm 
+	app-algorithm-series
+	app-algorithm-array
+	app-algorithm-matrix
+	app-algorithm-math
+	app-algorithm-application
+app-component
+	app-component-button
+	app-component-input
+	app-component-alert
+	app-component-list
+	app-component-table
+app-context
+app-oop
+	app-oop-encapsulation
+	app-oop-inheritance
+	app-oop-polymorphism
+app-permission
+app-person
+	app-person-patient
+	app-person-doctor
+	app-person-nurse
+	app-person-admin
+app-session
+app-ui
+app-util
+==============================
+*/
+var app=app || {};
+/*
+========= app-algorithm ====
+@AUTHOR : pakjkwan@gmail.com
+@CREATE DATE : 2017-4-1
+@UPDATE DATE : 2017-4-1
+@DESC : 
+==============================
+*/
+
+
+
 /*Model
  * app.context
  * app.session
@@ -6,7 +48,7 @@
  * app.oop
  * 
  */
-var app=app||{};
+
 app.context=(function(){
 	var init=function(context){
 		app.session.init(context);

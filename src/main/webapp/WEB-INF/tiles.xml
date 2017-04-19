@@ -41,4 +41,21 @@
 	<definition name="nurse:*/*" extends="nurse">
 		<put-attribute name="container" value="/WEB-INF/views/{1}/{2}.jsp"/>
 	</definition>
+	<!--no tiles  -->
+	<definition name="noTiles" template="/WEB-INF/views/layout/noTemplate.jsp">
+	<put-attribute name="noTemplate" value=""/>	
+	</definition>
+	
+	<definition  name="*.jsp" extends="noTiles">
+	<put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp"/>
+	</definition>
+	
+	<definition name="*/*.jsp" extends="noTiles">
+	<put-attribute name="noTemplate" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	
+	<definition name="*/*/*.jsp" extends="noTiles">
+	<put-attribute name="noTemplate" value="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
 </tiles-definitions>
