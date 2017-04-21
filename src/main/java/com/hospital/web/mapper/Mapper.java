@@ -17,6 +17,7 @@ public interface Mapper { /*mapper는 람다로 바꿀수 없다 myBatis와 일�
 	public int registPatient(Object o) throws Exception;
 	public int registDoctor(Object o) throws Exception;
 	public int registNurse(Object o) throws Exception;
+	public int registerChart(Object o)throws Exception;
 	
 	//마이 바티스는 findOne과 findSome을 구분 짓지 않음
 	public Patient findPatient(Map<?, ?>map) throws Exception;
@@ -26,7 +27,7 @@ public interface Mapper { /*mapper는 람다로 바꿀수 없다 myBatis와 일�
 	public List<Patient> findPatients(Map<?,?>map)throws Exception;
 	public List<Doctor> findDoctors(Map<?,?>map)throws Exception;
 	public List<Nurse> findNurses(Map<?,?>map)throws Exception;
-	public List<Chart> findChart(Map<?,?>map)throws Exception;
+	public List<Chart> chartList(Map<?,?>map)throws Exception;
 	public int updatePatient(Patient member) throws Exception;
 	public int updateDoctor(Doctor member) throws Exception;
 	public int updateNurse(Nurse member) throws Exception;

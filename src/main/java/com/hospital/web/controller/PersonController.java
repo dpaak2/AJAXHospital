@@ -107,8 +107,8 @@ public class PersonController {
 		for (int i = 0; i < gArr.length; i++) {
 			String[] strArr = gArr[i].split("/");
 			paramMap.put("group", strArr[0]);
-			paramMap.put("idType", strArr[1]);
-			paramMap.put("id", strArr[2]);
+			paramMap.put("key", strArr[1]);
+			paramMap.put("value", strArr[2]);
 			rs = personService.exist(paramMap);
 			if (rs != 0) {
 				target = gArr[i];

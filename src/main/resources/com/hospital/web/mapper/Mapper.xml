@@ -36,7 +36,7 @@
 		<result property="major" column="major_job"/>
 		<result property="position" column="nur_position"/>
 	</resultMap>
-	<resultMap type="com.hospital.web.domain.Chart" id="Chart">
+	<resultMap type="com.hospital.web.domain.Chart" id="Chart"> <!-- big bean -->
 		<id property="id" column="chartId"/>
 		<result property="patientId" column="patientId"/>
 		<result property="nurseId" column="nurseId"/>
@@ -72,6 +72,9 @@
     <insert id="registNurse">
   INSERT INTO ${group}(${nur_id},${nur_pass},${nur_name},${nur_gen},${nur_phone},${nur_email},${major_job},${nur_position}) 
    VALUES ( #{id}, #{pass}, #{name}, #{gen}, #{phone}, #{email},#{major}, #{position})
+	</insert>
+	   <insert id="registerChartFile">
+  INSERT INTO Chart(chart_contents) VALUES(#{chartContent})WHERE chart_id=#{chartId}
 	</insert>
 	
   <select id="findPatient" resultMap="Patient" parameterType="hashMap">
@@ -151,9 +154,9 @@
   WHERE pat_id = #{id}
 </update>
 
-  <select id="findChart" resultMap="Chart" parameterType="hashMap">
+  <select id="chartList" resultType="com.hospital.web.domain.Chart" parameterType="hashMap">
     SELECT * FROM ChartView 
-    WHERE patientId=#{id}
+    WHERE patientId=#{value} and chartId IS NOT NULL
 
   </select>
   
@@ -161,7 +164,7 @@
   	SELECT COUNT(*) FROM 
   </select>
   <select id="exist" resultType="int" parameterType="hashMap">
-  	SELECT COUNT(*) FROM ${group} WHERE ${idType}=#{id}
+  	SELECT COUNT(*) FROM ${group} WHERE ${key}=#{value}
   	
   </select>
   <select id="find"  resultType="com.hospital.web.domain.Patient">

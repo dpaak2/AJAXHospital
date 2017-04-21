@@ -6,6 +6,7 @@ app-algorithm
 	app-algorithm-matrix
 	app-algorithm-math
 	app-algorithm-application
+	app-bbs
 app-component
 	app-component-button
 	app-component-input
@@ -1044,6 +1045,28 @@ app.algorithm = (function() {
 		appl : appl
 	};
 })();
+/*
+ * =================app-component===
+ * @
+ * @
+ * @
+ * */
+app.bbs=(function(){
+	var init=function(){
+		var wrapper = app.component.getWrapper();
+		wrapper.html(app.ui.bbs());
+		$('#bbs').on('click',function(){
+			alert('click bbs');
+			
+		});
+		
+	};
+	return{
+		init:init
+	};
+})();
+
+
 app.oop = (function() {
 	var init = function() {
 		onCreate();
@@ -1226,169 +1249,222 @@ app.component = (function() {
 
 	};
 })();
-app.permission = (function() {
+app.permission=(function(){
 	var execute=function(){
+		login();
+		
+	    $('#login-form-link').on('click',function(e) {
+			$("#login-form").delay(100).fadeIn(100);
+	 		$("#register-form").fadeOut(100);
+			$('#register-form-link').removeClass('active');
+			$(this).addClass('active');
+			e.preventDefault();
+		});
+		$('#register-form-link').on('click',function(e) {
+			$("#register-form").delay(100).fadeIn(100);
+	 		$("#login-form").fadeOut(100);
+			$('#login-form-link').removeClass('active');
+			$(this).addClass('active');
+			e.preventDefault();
+		});
+		
+		/*
+		radio 체크 할때마다 incommon-info 의 화면이 변동됨
+		 * */
+		
+		$('#register-patient').on('click',function(e){
+			e.preventDefault();
+			var _id=$('#id').val();
+			var _pass=$('#pass').val();
+			var _name=$('#name').val();
+			var _phone=$('#phone').val();
+			if(app.util.validation(_id)
+				&& app.util.validation(_pass)
+				&& app.util.validation(_name)
+				&& app.util.validation(_phone)){
+				var json={
+					'id' : _id,
+					'name' : _name,
+					'pass' : _pass,
+					'phone' : _phone,
+					'email' : $('#email').val()
+				};
+							
+					$.ajax({
+						url : context+'/post/patient',
+						method : 'POST',
+						data : JSON.stringify(json),
+						 dataType: "json",
+						 contentType: 'application/json',
+						success : function(data){
+							alert('회원가입 성공 .. 로그인 바랍니다');
+							location.reload();
+						},
+						error : function(xhr,status,msg){alert('환자등록 시'+msg);}
+					});
+			}else{
+				alert('반드시 입력될 값이 비워져 있습니다');
+			};
+		});
+		$('#register-doctor').on('click',function(e){
+			e.preventDefault();
+		});
+		$('#register-nurse').on('click',function(e){
+			e.preventDefault();
+		});
+		$('#register-admin').on('click',function(e){
+			e.preventDefault();
+		});
+	};
+	var login = function(){
+		alert('login!!!!!');
 		var context=app.session.getContextPath();
 		console.log('app.login context :'+context);
-		
-		$('#login-submit').on('click',function(e){
-			e.preventDefault();
-			$.ajax({
-				 url: context+"/login",
-				 method: "POST",
-				 data: JSON.stringify({ 
-					 	id : $('#username').val(),
-					 	pass : $('#password').val()
-					 }),
-				 dataType: "json",
-				 contentType: 'application/json',
-				 success: function(data){
-					 if(data.result==='success'){
-						 $('#boot-nav').remove();
-						 $('#wrapper').html(app.ui.patientGnb());
-						 $('#wrapper').append(app.ui.patientDetail());
-						 $('#name').text(data.patient.name);
-						 $('#gen').text(data.patient.gen);
-						 $('#phone').text(data.patient.phone);
-						 $('#email').text(data.patient.email);
-						 $('#job').text(data.patient.job);
-						 $('#addr').text(data.patient.addr);
-						 $('#docID').text(data.patient.docID);
-						 var jumin=data.patient.jumin;
-						 console.log('jumin'+jumin);
-						 var birth='';
-						 var age='';
-						 $('#birth').text(birth);
-						 $('#age').text(age);
-						 $('#btn-default').on('click',function(e){
-							 e.preventDefault();
-							 $.ajax({
-								 url:context+'/get/chart',
-								 method:'POST',
-								 data:JSON.stringify({}),
-								 dataType:'json',
-								 contentType:'application/json',
-								 success:function(data){
-									 $('#boot-nav').remove();
-									 $('#wrapper').html(app.ui.patientGnb());
-									 $('#wrapper').append(app.ui.chart());
-									 $('#name').text(data.patient.name);
-								 },
-								 error:function(x,s,m){alert(m);}
-							 });
-						 });
-					 }else{
-						 alert('조회된 ID 가 존재하지 않습니다.');
-					 }
-				 },
-				 error: function(x,s,m) {
-					alert('로그인 실패이유:'+m);
-				}
-			});
-		});
-		  $('#login-form-link').on('click',function(e) {
-				$("#login-form").delay(100).fadeIn(100);
-		 		$("#register-form").fadeOut(100);
-				$('#register-form-link').removeClass('active');
-				$(this).addClass('active');
-				e.preventDefault();
-			});
-			$('#register-form-link').on('click',function(e) {
-				$("#register-form").delay(100).fadeIn(100);
-		 		$("#login-form").fadeOut(100);
-				$('#login-form-link').removeClass('active');
-				$(this).addClass('active');
-				e.preventDefault();
-			});
-			
-			/*
-			radio 체크 할때마다 incommon-info 의 화면이 변동됨
-			 * */
-			
-			$('#register-patient').on('click',function(e){
-				e.preventDefault();
-				var _id=$('#id').val();
-				var _pass=$('#pass').val();
-				var _name=$('#name').val();
-				var _phone=$('#phone').val();
-				if(app.util.validation(_id)
-					&& app.util.validation(_pass)
-					&& app.util.validation(_name)
-					&& app.util.validation(_phone)){
-					var json={
-						'id' : _id,
-						'name' : _name,
-						'pass' : _pass,
-						'phone' : _phone,
-						'email' : $('#email').val()
-					};
-								
-						$.ajax({
-							url : context+'/post/patient',
-							method : 'POST',
-							data : JSON.stringify(json),
-							 dataType: "json",
-							 contentType: 'application/json',
-							success : function(data){
-								alert('회원가입 성공 .. 로그인 바랍니다');
-								location.reload();
-							},
-							error : function(xhr,status,msg){alert('환자등록 시'+msg);}
-						});
-				}else{
-					alert('반드시 입력될 값이 비워져 있습니다');
-				};
-			});
-		$('#register-doctor').on('click', function(e) {
-			alert('register-doctor');
-			e.preventDafault();
-			$.ajax({
-				url : context + "/post/doctor",
-				method:'POST',
-				data:JSON.stringify({}),
-				dataType:'json',
-				contentType:'application/json',
-				success: function(data){},
-				error:function(xhr,status,msg){alert('의사 가입시 에러:'+msg);}
-			});
-		});
-		$('#register-nurse').on('click', function(e) {
-			alert('register-nurse');
-			e.preventDafault();
-			$.ajax({
-				url : context + "/post/nurse",
-				method : "POST",
-				data : JSON.stringify({
-					id : $('#id').val(),
-					pass :$('#password').val(),
-				
-					name:$('#name').val()
-										
-				}),
-				dataType:'json',
-				contentType:'application/json',
-				success:function(data){},
-				error:function(xhr,status,msg){alert('환자가입시 에러:'+msg);}
-
-			});
-		});
-		$('#register-admin').on('click', function(e) {
-			alert('register-admin');
-			e.preventDafault();
-			$.ajax({
-				url : context + "/post/admin",
-				method:'POST',
-				data: JSON.stringify({}),
-				dataType:'json',
-				contentType:'application/json',
-				success:function(data){},
-				error:function(xhr,status,msg){alert('admin가입시 에러'+msg);}
-			});
-		});
-
-	};
+	    var authId = $.cookie('authId');
+	    if(authId != undefined) {
+	    	$('#username').val(authId);
+	        $("#remember").prop("checked",true);
+	    }
+	    $('#login-submit').on('click',function(e){
+	        if($.trim($("#username").val()) == "") {
+	            alert("아이디를 입력하세요");
+	            return;
+	        } else {
+	            if($("#remember").prop("checked")) {
+	                $.cookie('authId', $("#username").val());
+	            } else {
+	                $.removeCookie("authId");
+	            }
+	            alert("로그인!!");
+	            e.preventDefault();
+	            $.ajax({
+					 url: context+"/login",
+					 method: "POST",
+					 data: JSON.stringify({ 
+						 	id : $('#username').val(),
+						 	pass : $('#password').val()
+						 }),
+					 dataType: "json",
+					 contentType: 'application/json',
+					 success: function(data){
+						 if(data.result==='success'){
+							 
+							 $('#boot-nav').remove();
+							 $('#wrapper').html(app.ui.patientGnb());
+							 $('#wrapper').append(app.ui.patientDetail());
+							 $('#name').text(data.patient.name);
+							 $('#gen').text(data.patient.gen);
+							 $('#phone').text(data.patient.phone);
+							 $('#email').text(data.patient.email);
+							 $('#job').text(data.patient.job);
+							 $('#addr').text(data.patient.addr);
+							 $('#docID').text(data.patient.docID);
+							 var jumin=data.patient.jumin;
+							 console.log('jumin:'+jumin);
+							 var birth='';
+							 var age='';
+							 $('#birth').text(birth);
+							 $('#age').text(age);
+							 /*"id","pass","name","","phone","email","job","jumin","addr","docID","nurID"*/
+							   $('#btn-default').on('click',function(e){
+			                         $('#wrapper').html(app.ui.patientGnb());
+			                        e.preventDefault();
+			                        $.ajax({
+			                           url : context+'/get/chart',
+			                           method : 'POST',
+			                           data : JSON.stringify({id : $.cookie('authId')}),
+			                           dataType : 'json',
+			                           contentType : 'application/json',
+			                           success : function(data){
+			                              if(data.result==='fail'){
+			                                 $('<div><h1 id="msg"></h1></div>').attr('id','chart-free').appendTo('#wrapper');
+			                                 $('#chart-free').css('width','80%').css('margin-top','50px').addClass('app-margin-center');
+			                                 $('#msg').text('등록된 차트가 없습니다');
+			                              }else{
+			                                 $('#wrapper').append(app.ui.chart());
+			                                 $('#name').text(data.patient.name);
+			                                 // mission
+			                                 $("<div></div>").attr('id','app-chart-bottom').appendTo('#app-chart-center');
+			                                 var chartList='<table><thead id="thead">';
+			                                 var row = '<tr>';
+			                                 var arr=['순서','진료일','진료 NO','담당의사','직책','진료과목','병명','처방내역'];
+			                                 for(var i=0;i<8;i++){
+			                                    row+='<th style="border:1px solid black">'+arr[i]+'</th>';
+			                                 }
+			                                 row+='</tr></thead><tbody id="tbody">';
+			                                 chartList+=row;
+			                                 row='';
+			                                 //진료일 진료no 담당의사 직책 진료과목 병명 처방내역   
+			                                 $.each(data.list,function(i,chart){
+			                                    row+='<tr >'
+			                                    +'<td style="border:1px solid black">'+(i+1)+'</td>'
+			                                    +'<td style="border:1px solid black">'+chart.treatmentId+'</td>'
+			                                    +'<td style="border:1px solid black">'+chart.treatDate+'</td>'
+			                                    +'<td style="border:1px solid black">'+chart.doctorName+'</td>'
+			                                    +'<td style="border:1px solid black">'+chart.doctorPosition+'</td>'
+			                                    +'<td style="border:1px solid black">'+chart.doctorMajor+'</td>'
+			                                    +'<td style="border:1px solid black">'+chart.chartContents+'</td>'
+			                                    +'<td style="border:1px solid black">'+chart.treatContents+'</td>'
+			                                 });
+			                                 chartList+=row;
+			                                 chartList+='</tbody></table>';
+			                                 $('.row').css('border','1px solid black').addClass('app-text-center');
+			                                 $(chartList).attr('id','chart-list')
+			                                 .css('margin-top','20px').addClass('app-chart-bottom-table')
+			                                 .appendTo('#app-chart-bottom');
+			                                 var chartId=data.patient.chartId;
+			                                 $('#btn-file-upload').on('click',function(e){
+			                                    e.preventDefault();
+			                                    alert('#####'+$('#form').attr('action'));
+			                                    $.ajax({
+			                                       url:context+'/post/chart/id',
+			                                       method:'POST',
+			                                       data:JSON.stringify({chartId:chartId}),
+			                                       dataType:'json',
+			                                       contentType:'application/json',
+			                                       success:function(data){
+			                                          $('#form').ajaxForm({
+			                                             url:$('#form').attr('action'),
+			                                             dataType:'text',
+			                                             enctype:"multipart/form-data",
+			                                             
+			                                             beforeSubmit : function(){
+			                                                alert('로딩화면 !');
+			                                             },
+			                                             success : function(){
+			                                                alert('등록완료 !'+data.result);
+			                                             }
+			                                          });
+			                                          $('#form').submit();
+			                                       },
+			                                       error:function(xhr,status,msg){
+			                                          alert(msg);
+			                                       }
+			                                    });
+			                                 })
+			                              }
+			                           },
+			                           error : function(x,s,m){alert(m);}
+			                        });
+			                      });
+			                   }else{
+			                      alert('조회된 ID 가 존재하지 않습니다.');
+			                   }
+			                },
+			                error: function(xhr,status,msg) {
+			                  alert('로그인 실패이유:'+msg);
+			               }
+			            });
+			           }
+			         
+			      });
+			       $("#login_button").click(function(){
+			           
+			       })
+			   };
 	return {
-		execute : execute
+		execute : execute,
+		lpgin:login
 	};
 })();
 
@@ -1524,6 +1600,7 @@ app.ui={
 		},
 
 		chart : function(){
+			var context= app.session.getContextPath();
 			var image = app.session.getImagePath();
 			$("<div></div>").attr('id','div-chart').appendTo('#wrapper');
 			$('#div-chart').css('width','80%').css('margin-top','50px').addClass('app-margin-center');
@@ -1531,11 +1608,11 @@ app.ui={
 			
 			var table=
 				'<table>'
-				+'<tr><td rowspan="5" style="width:100px">환<br/>자<br/>정<br/>보</td><td class="app-chart-table-elem">이름</td><td colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">직업</td><td class="app-chart-top-table"></td></tr>'
-				+'<tr><td class="app-chart-table-elem">생년월일</td><td class="app-chart-top-table"></td><td class="app-chart-col-table">키</td><td class="app-chart-top-table"></td><td class="app-chart-table-elem">직업</td><td class="app-chart-top-table"></td></tr>'       
-				+'<tr><td class="app-chart-table-elem">성별</td><td colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">몸무게</td><td class="app-chart-top-table"></td></tr>'
-			    +'<tr><td class="app-chart-table-elem">전화번호</td><td colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">혈액형</td><td class="app-chart-top-table"></td></tr>'
-			    +'<tr><td class="app-chart-table-elem">주소</td><td colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">주치의</td><td class="app-chart-top-table"></td></tr>'
+				+'<tr><td rowspan="5" style="width:100px">환<br/>자<br/>정<br/>보</td><td class="app-chart-table-elem">이름</td><td id="name" colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">직업</td><td id="job" class="app-chart-top-table"></td></tr>'
+				+'<tr><td class="app-chart-table-elem">생년월일</td><td id="birth" class="app-chart-top-table"></td><td id="birth" class="app-chart-col-table">키</td><td class="app-chart-top-table"></td><td class="app-chart-table-elem">나이</td><td id="age" class="app-chart-top-table"></td></tr>'       
+				+'<tr><td class="app-chart-table-elem">성별</td><td id="gen" colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">몸무게</td><td class="app-chart-top-table"></td></tr>'
+			    +'<tr><td class="app-chart-table-elem">전화번호</td><td id="phone" colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">혈액형</td><td class="app-chart-top-table"></td></tr>'
+			    +'<tr><td class="app-chart-table-elem">주소</td><td id="addr" colspan="3" class="app-chart-top-table"></td><td class="app-chart-table-elem">주치의</td><td id="docName" class="app-chart-top-table"></td></tr>'
 				+'</table>';			 
 			$(table).attr('id','app-chart-top-table').appendTo('#app-chart-top');
 			$('#app-chart-top-table').css('width','800px');
@@ -1543,8 +1620,8 @@ app.ui={
 			$("<div></div>").attr('id','app-chart-center').appendTo('#app-chart-top');
 			$('#app-chart-center').addClass('app-chart-center');
 			var fileUpload=
-				'<form id="form-file-upload" name="upload" method="post"'
-				+'action="" enctype="multipart/form-data">'
+				'<form id="form" name="upload" method="post"'
+				+'action="'+context+'/post/chart/image" enctype="multipart/form-data">'
 				+'<input type="file" id="file" name="file"/>'
 				+'<input type="submit" id="btn-file-upload" value="파일업로드">'
 				+'</form>';
@@ -1555,25 +1632,59 @@ app.ui={
 			        '<input type="button" value="파일업로드" style="float: left;"/>'+
 			    '</div>	'+fileUpload);
 			$('#form-file-upload').css('margin-top','20px');
-			$("<div></div>").attr('id','app-chart-bottom').appendTo('#app-chart-center');
-			$('<table><thead id="thead"></thead><tbody id="tbody"></tbody></table>').attr('id','app-chart-bottom-table').appendTo('#app-chart-bottom');
-			var row = '<tr>';
-			var arr=['순서','진료일','진료 NO','담당의사','직책','진료과목','병명','처방내역'];
-			for(var i=0;i<8;i++){
-				row+='<th>'+arr[i]+'</th>';
-			}
-			row+='</tr>';
-			$('#thead').html(row);
-			var row = '<tr>';
-			for(var i=0;i<8;i++){
-				row+='<td>'+'example'+'</td>';
-			}
-			row+='</tr>';
-			$('#tbody').html(row);
-			$('#thead th').addClass('app-chart-table-elem').addClass('app-text-center');
-			$('#tbody td').addClass('app-chart-table-elem').addClass('app-text-center');
-			$('#app-chart-bottom-table').css('margin-top','20px').addClass('app-chart-bottom-table');
-		
+		},
+		bbs:function(){
+			var context= app.session.getContextPath();
+			var image = app.session.getImagePath();
+			var bbs='<div style="height: 120px;"></div>'
+				+'<table id="bbs">'
+				+'<tr><th>총게시글수 : ${count} 건</th></tr>'
+				+'<tr>'
+				+		'<th>No</th>'
+				+       '<th>ID</th>'
+				+       '<th>제목</th>'
+				+		'<th>등록일</th>'
+				+		'<th>조회수</th>'
+				+	'</tr>'
+				+'<c:forEach var="article" items="${requestScope.list}" > <!-- 확장 for문과 동일  -->'
+				+	'<tr>'
+				+		'<td>${article.seq}</td>'
+				+		'<td>${article.id}</td>'
+				+		'<td><a href="${context}/board.do?action=detail&page=articleDetail&seq=${article.seq}">${article.title}</a></td>'
+				+		'<td>${article.regdate}</td>'
+				+		'<td>${article.readCount}</td>'
+				+	'</tr>'
+				+'</c:forEach>'
+				+'</table>'
+
+				+'<nav id="pagination">'
+				+'<ul>'
+				+'<c:if test="${requestScope.prevBlock gt 0}">'
+				+'<li>'
+				+	'<a style="color:white;" href="${context}/board.do?action=list&page=articleList&pageNO=${requestScope.prevBlock} ">◀PREV</a>'
+				+'</li>'
+				+'</c:if>'
+				+'<c:forEach varStatus="i"  begin="${requestScope.blockStart}" end="${requestScope.blockEnd}" step="1" > <!-- 일반 for문과 동일 (step은 i++과 동일한 의미)-->'
+					+'<li style="width:20px; ">'
+						+'<c:choose>'
+							+'<c:when test="${i.index eq pageNO}">'
+						 		+'<a href="#"><font style="color:red">${i.index}</font></a>'
+							+'</c:when>'
+							+'<c:otherwise>'
+								+'<a class="text_center" style="color: black" href="${context}/board.do?action=list&page=articleList&pageNO=${i.index}">${i.index}</a>'
+							+'</c:otherwise>'
+						+'</c:choose>'
+					+'</li>'
+				+'</c:forEach>'
+				+'<c:if test="${requestScope.nextBlock le pageCount}">'
+				+'<li>'
+					+'<a style="color:white;" href="${context}/board.do?action=list&page=articleList&pageNO=${requestScope.nextBlock}">NEXT▶</a>'
+				+'</li>'
+				+'</c:if>'
+				+'</ul>'
+				+'</nav>'
+		 		+'<script>';
+			return bbs;
 		}
 };
 		

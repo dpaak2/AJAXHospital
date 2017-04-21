@@ -275,3 +275,42 @@ UPDATE Article SET title='a',content='b',regdate='c' WHERE art_seq=37;
 
 SELECT t2.* FROM (SELECT ROWNUM seq,t.* FROM (SELECT * FROM ARTICLE ORDER BY art_seq DESC) t) t2
 WHERE t2.seq BETWEEN 6 AND 10;
+
+
+
+CREATE VIEW ChartView
+AS
+SELECT
+p.pat_id AS patientId,
+p.nur_id AS nurseId,
+p.doc_id AS doctorId,
+p.pat_pass AS pass,
+p.pat_name AS name,
+p.pat_gen AS gen,
+p.pat_jumin AS jumin,
+p.pat_addr AS addr,
+p.pat_phone AS phone,
+p.pat_email AS email,
+p.pat_job AS job,
+c.chart_id AS chartId,
+t.treat_id AS treatmentId,
+c.chart_contents  as chartContents,
+d.major_treat AS doctorMajor,
+d.doc_name AS doctorName,
+d.doc_position  AS doctorPosition,
+n.nur_name AS nurseName,
+n.nur_position  AS nurPosition,
+t.treat_contents AS treatContents,
+t.treat_date AS treatDate
+FROM
+Patient p
+LEFT JOIN Chart c ON c.pat_id =p.pat_id
+LEFT JOIN Doctor d On d.doc_id =p.doc_id
+LEFT JOIN Nurse n ON n.nur_id=p.nur_id
+LEFT JOIN Treatment t ON t.pat_id=p.pat_id
+WHERE p.pat_id='poh';
+commit;
+
+DROP VIEW ChartView;
+SELECT *FROM ChartView;
+
