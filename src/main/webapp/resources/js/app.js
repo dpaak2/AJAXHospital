@@ -50,6 +50,7 @@ app.context = (function() {
 		app.algorithm.init();
 		app.oop.init();
 		app.person.init();
+		app.bbs.init();
 	};
 	var setContentView = function() {
 	};
@@ -1054,10 +1055,9 @@ app.algorithm = (function() {
 app.bbs=(function(){
 	var init=function(){
 		var wrapper = app.component.getWrapper();
-		wrapper.html(app.ui.bbs());
 		$('#bbs').on('click',function(){
 			alert('click bbs');
-			
+			wrapper.html(app.ui.bbs());
 		});
 		
 	};
